@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dish</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Home</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/recipes">All Recipes</a>
+              </li>
+              <li class="nav-item">
+                <% if(username){ %>
+                  <a class="nav-link">Welcome, <%=username%></a>
+                <% }else{%>
+                <a class="nav-link" href="/login">Login</a>
+                <% }%>
+              </li>
+            </ul>
+            <form class="d-flex">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success me-2" type="submit">Search</button>
+              <% if(username){ %>
+                <a class="btn btn-outline-danger me-2 " href="/logout">Logout</a>
+                <div class="d-flex">
+                    <img class="profilePic" src="/uploads/<%= image %>" alt="profile pic">
+          
+                  </div>
+            <% }%>
+            </form>
+          </div>
+        </div>
+      </nav>
+    <div id="recipeboby"class="recipeboby">
+        <h1 id="dish_title" class="mb-4 "></h1>
+        <img id = "recipieImage" class="recipe_img" src="" alt="">
+        <div class="recipe_content">
+            <div id="ingredients" class="ingredients">
+                <h4>Ingredients</h4>                                
+            </div>
+            <div class="instruction">
+                <h1>Instructions</h1>
+                <p id="strInstructions"></p>
+            </div>
+          </div>
+      </div>
+      <table  class="table bordered mb-4">
+        <thead>
+          <tr>
+            <th scope="col">Area</th>
+            <th scope="col">Category</th>
+            <th scope="col">Tags</th>
+            <th scope="col">Youtube link</th>
+          </tr>
+        </thead>
+        <tr id="table_row">
+          
+        </tr>
+
+      </table>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+    let recipieId = localStorage.getItem("idMeal");
+    let recipe ;
+    console.log(recipieId); 
+    const url = `http://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipieId}`;
+
+    fetch(url)
+    .then(response=>response.json())
+    .then(data=>{
+        recipe = data.meals[0];
+        const ingredientlist = document.getElementById("ingredients");
+        //add the dish title 
+        const dishTitle = document.getElementById("dish_title")
+        dishTitle.textContent = recipe.strMeal;
+        //add the image
+        const image = document.getElementById("recipieImage");
+        image.src = recipe.strMealThumb;
+        //Add the instructions
+        const strInstructions = document.getElementById("strInstructions");        
+        strInstructions.innerText = recipe.strInstructions; 
+         //create table row
+         
+        //create a h5 with span as its measure
+        for (let i = 1; i <= 20; i++) {
+      const ingredientKey = `strIngredient${i}`;
+      let ingredientValue = recipe[ingredientKey];
+      ingredientValue = ingredientValue.charAt(0).toUpperCase() + ingredientValue.slice(1);
+      const ingredientMeasure = `strMeasure${i}`;
+      const measureValue = recipe[ingredientMeasure]
+
+      // Check if the value is non-empty
+      if (ingredientValue && ingredientValue.trim() !== "") {
+        // Create an h5 element for the ingredient
+        const ingredientElement = document.createElement("p");
+        ingredientElement.classList = "ingr_list" 
+        ingredientElement.textContent = ` ${ingredientValue} - ${measureValue}`;
+       
+        // Append the ingredient element to the container
+        ingredientlist.appendChild(ingredientElement);
+      }
+    }
+    const table_row = document.getElementById("table_row"); // Corrected typo
+console.log(table_row);
+
+const row1 = document.createElement("td");
+row1.textContent = recipe.strArea;
+table_row.appendChild(row1);
+
+const row2 = document.createElement("td");
+row2.textContent = recipe.strCategory;
+table_row.appendChild(row2);
+
+const row3 = document.createElement("td");
+row3.textContent = recipe.strTags;
+table_row.appendChild(row3);
+
+const row4 = document.createElement("td");
+row4.textContent = recipe.strYoutube;
+table_row.appendChild(row4);
+
+    })
+    </script>
+</body>
+</html>
